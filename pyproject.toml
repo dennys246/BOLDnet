@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuronet"
+version = "0.1.0"
+description = "A package for building convolutional neural networks for neuroimaging data"
+readme = "README.md"
+authors = [{ name = "Denny Schaedig", email = "denny.schaedig@gmail.com" }]
+license = { file = "LICENSE" }
+dependencies = [
+    "requests",  # Example dependency
+    "os",
+    "csv",
+    "random",
+    "time",
+    "atexit",
+    "psutil",
+    "matplotlib",
+    "glob",
+    "numpy",
+    "nibabel",
+    "nilearn",
+    "sklearn",
+    "scipy",
+    "shutil"
+]
+
+[project.urls]
+Homepage = "https://github.com/dennys246/NeuroNet"
+Documentation = "https://github.com/dennys246/NeuroNet/blob/main/README.md"
+Source = "https://github.com/dennys246/NeuroNet"
