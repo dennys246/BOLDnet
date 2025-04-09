@@ -115,7 +115,7 @@ NOTE: The observe function will load a test subject that hasn't been seen by the
 
 (In development)
 
-Transfer learning is completely achievable with NeuroNet by simply loading a pre-trained model built with NeuroNet and adjusting the config variable loaded before building...
+Transfer learning is completely achievable with NeuroNet by simply loading a pre-trained model built with NeuroNet and adjusting the config variable loaded before building. Below is an example of loading a pre-trained classification BOLDnet model, switching the activation to linear for a regression paradign, then building the model with the new configuration.
 
 ```
 net.load_model('pre/trained/classification/model/directory/path/')
