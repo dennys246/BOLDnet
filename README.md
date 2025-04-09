@@ -1,15 +1,15 @@
-# NeuroNet
-This repository contains the source code for NeuroNet used for building and training AI on NeuroImaging data previously known as KleinNet. This tool can be used on any fMRI data collected on regression or classification tasks and is compatable with all BIDS formatted data to rapidly load in data and start training an AI in as little as 7 lines of code. NeuroNet at it's core is a TensorFlow wrapper that is entirely customizable to the task at hand with a tried and tested default convolutional neural network structure based off the paper (add citation). The tool incorperates modern neural network architecture's like attention mechanism's and mulit-scalar pooling to learn intricate non-learner spatial relationships in your data. Heatmaps and experimental multi-voxel pattern analysis allow for us to gain insight into the hidden layers of the model and the important patterns the model finds useful for predicting!
+# BOLDnet
+This repository contains the source code for BOLDnet used for building and training AI on NeuroImaging data previously known as KleinNet. This tool can be used on any fMRI data collected on regression or classification tasks and is compatable with all BIDS formatted data to rapidly load in data and start training an AI in as little as 7 lines of code. BOLDnet at it's core is a TensorFlow wrapper that is entirely customizable to the task at hand with a tried and tested default convolutional neural network structure based off the paper (add citation). The tool incorperates modern neural network architecture's like attention mechanism's and mulit-scalar pooling to learn intricate non-learner spatial relationships in your data. Heatmaps and experimental multi-voxel pattern analysis allow for us to gain insight into the hidden layers of the model and the important patterns the model finds useful for predicting!
 
 <img width="577" alt="image" src="https://github.com/user-attachments/assets/0c4b9833-34f3-438b-bdec-e50b92ee62ba" />
 
-# How to train NeuroNet on your NeuroImaging data
-To run NeuroNet first import the library and initialize a model...
+# How to train BOLDnet on your NeuroImaging data
+To run BOLDnet first import the library and initialize a model...
 
 ```
-import neuronet as nn
+import BOLDnet as nn
 
-net = nn.NeuroNet()
+net = nn.BOLDnet()
 ```
 
 Once TensorFlow and your default model builder has initialized, you now need to orient your model to you dataset. You can do this by calling the net.orient() function which takes three argumentsl; your BIDS compliant folder containing your neuroimaging data, your BOLD file identifier and your label file identifier. 
@@ -28,7 +28,7 @@ From here you can customize the AI architecture and training process completely 
 ```
 config = {
     "dataset": "NeuroImaging Study",
-    "architecture": "NeuroNet",
+    "architecture": "BOLDnet",
     "shuffle": False,
     "epochs": 10,
     "batch_size": 36,
@@ -86,9 +86,9 @@ net.train()
 ```
 NOTE: The net.load() function will return a ```None``` result it it failed to load enough subjects from the batch of subject you passed in to load.
 
-# Exploring what NeuroNet learned
+# Exploring what BOLDnet learned
 
-NeuroNet was built with the hope to gain further insight into what the AI learns as useful patterns in predicting an outcome. Neuroscience has a massive body of research surrounding the different paradigms of the human experience, which makes AI an interesting avenue for exploring neuroimaging data given the known spatial patterns as a benchmark of sorts. To accomplish this NeuroNet has a seperate observer.lens() class object used to explore the NeuroNet you've trained. It can do anything from plotting your models accuracy to extracting the heatmaps and outputting them into MNI space for visualization as seen at the top of this library.
+BOLDnet was built with the hope to gain further insight into what the AI learns as useful patterns in predicting an outcome. Neuroscience has a massive body of research surrounding the different paradigms of the human experience, which makes AI an interesting avenue for exploring neuroimaging data given the known spatial patterns as a benchmark of sorts. To accomplish this BOLDnet has a seperate observer.lens() class object used to explore the BOLDnet you've trained. It can do anything from plotting your models accuracy to extracting the heatmaps and outputting them into MNI space for visualization as seen at the top of this library.
 
 To do some basic analysis of the accuracy and/or loss of the model, you can call to the ```net.lens.plot_accuracy()```. This grabs the model history saved to your net.config object and plots it to your model directory using matplotlib.
 ```
@@ -103,7 +103,7 @@ for subject in net.config.subject_pool:
     net.predict(subject)
 ```
 
-One of the most important functions apart of the `observer.lens()` class is the `lens.observe()` function, which takes an in depth dive into the feature maps generated apart of the AI. For every layer and every feature map, the tool deconvolves the maps back into their original shape and plots the features in MNI space to be visualized. For the final convolutional block in the NeuroNet model, a heatmap is generated to show the most important freature's used by the model. To generate all the feature and heat maps for a given outout, call the net.lens.observe() function and pass in the outcome you would like to observe like this...
+One of the most important functions apart of the `observer.lens()` class is the `lens.observe()` function, which takes an in depth dive into the feature maps generated apart of the AI. For every layer and every feature map, the tool deconvolves the maps back into their original shape and plots the features in MNI space to be visualized. For the final convolutional block in the BOLDnet model, a heatmap is generated to show the most important freature's used by the model. To generate all the feature and heat maps for a given outout, call the net.lens.observe() function and pass in the outcome you would like to observe like this...
 
 ```
 net.lens.observe(-0.9) # To generate feature maps for a test sample that is close to -0.9
@@ -111,11 +111,11 @@ net.lens.observe(-0.9) # To generate feature maps for a test sample that is clos
 
 NOTE: The observe function will load a test subject that hasn't been seen by the model, and find a sample within the test subject set that is within a 0.1 range of your interest
 
-# Transfer Learning with NeuroNet
+# Transfer Learning with BOLDnet
 
 (In development)
 
-Transfer learning is completely achievable with NeuroNet by simply loading a pre-trained model built with NeuroNet and adjusting the config variable loaded before building. Below is an example of loading a pre-trained classification BOLDnet model, switching the activation to linear for a regression paradign, then building the model with the new configuration.
+Transfer learning is completely achievable with BOLDnet by simply loading a pre-trained model built with BOLDnet and adjusting the config variable loaded before building. Below is an example of loading a pre-trained classification BOLDnet model, switching the activation to linear for a regression paradign, then building the model with the new configuration.
 
 ```
 net.load_model('pre/trained/classification/model/directory/path/')
