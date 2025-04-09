@@ -17,7 +17,10 @@ class neuronet:
 			print("Configuration failed, exiting...") 
 			return # Exit
 
-		self.wrangler = pipeline.wrangler(self.config)
+		# Initialize wrangler class for piping data
+		self.wrangler = pipeline.wrangler(self.config) 
+
+		#Initialize an observer class lens for analyzing network activity
 		self.lens = observer.lens(self.config)
 
 		self.model = None # Initialize model variable
