@@ -7,7 +7,7 @@ from glob import glob
 
 import pipeline, observer, config
 
-class neuronet:
+class boldnet:
 	
 	def __init__(self, network_folder = None):
 
@@ -30,7 +30,7 @@ class neuronet:
 
 		atexit.register(self.save) # Set up force save model before exiting
 
-		print("\n - NeuroNet Initialized -\n - Process PID - " + str(os.getpid()) + ' -\n')
+		print("\n - BOLDnet Initialized -\n - Process PID - " + str(os.getpid()) + ' -\n')
 	
 	def orient(self, bids_directory, bold_identifier, label_identifier, exclude_trained = False):
 		# Attach orientation variables to object for future use
@@ -40,7 +40,7 @@ class neuronet:
 
 		# Grab all available subjects with fMRIPrep data
 		self.subject_pool = []
-		print(f"\nOrienting and generating NeuroNet lexicon for bids directory {self.config.bids_directory}...")
+		print(f"\nOrienting and generating BOLDnet lexicon for bids directory {self.config.bids_directory}...")
 		
 		# Generate a lexicon of all potential subjects
 		if self.config.tool == 'default':
@@ -152,7 +152,7 @@ class neuronet:
 		return True
 
 	def plan(self):
-		print("\nPlanning NeuroNet model structure")
+		print("\nPlanning BOLDnet model structure")
 		# initialize an empty list to store layer filter counts
 		self.filter_counts = []
 		
@@ -194,7 +194,7 @@ class neuronet:
 		self.wrangler.create_dir()
 
 		# Plan and build out model structure based on config
-		print('\nConstructing NeuroNet model')
+		print('\nConstructing BOLDnet model')
 		if self.config.data_shape == None: # Grab x, y, z dimension sizes from first subject 
 			self.config.data_shape = self.wrangler.load_shape(self.subject_pool[0], self.example_session)
 		
@@ -256,11 +256,11 @@ class neuronet:
 			self.config.history_types = ['accuracy']
 			self.model.compile(optimizer = self.optimizer, loss = self.config.loss, metrics = self.config.history_types, run_eagerly=True) # Compile mode
 
-		print(f'\nNeuroNet model compiled using {self.config.optimizer} - {self.model.optimizer}')
+		print(f'\nBOLDnet model compiled using {self.config.optimizer} - {self.model.optimizer}')
 
 		# Check if a model already exists and load	
 		if self.load_model():
-			print('NeuroNet weights and history loaded...')
+			print('BOLDnet weights and history loaded...')
 			
 		else: # Else save new weights to checkpoint path
 			if os.path.exists(self.checkpoint_path) == False or self.config.rebuild == True:
@@ -402,10 +402,10 @@ class neuronet:
 			checkpoints = os.listdir(checkpoint_dir)
 			if len(checkpoints) > 0:
 				self.model.load_weights(self.checkpoint_path)
-				print('NeuroNet loaded successfully')
+				print('BOLDnet loaded successfully')
 				return True
 			else:
-				print('NeuroNet not found...')
+				print('BOLDnet not found...')
 				return False
 	
 	def display_memory(self):
