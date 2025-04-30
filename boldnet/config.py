@@ -54,12 +54,12 @@ config_template = {
     "loss": "mse",
     "rebuild": False,
     "use_wandb": False
-}
+} 
 
 class build:
     def __init__(self, config_folder = None):
-        config_json = None
         if config_folder: # Try and load config if folder passed in     
+            config_json = None
             config_files = glob(f"{config_folder}config.json")
             if len(config_files) == 0:
                 config_files = glob(f"{config_folder}/model/config.json")
@@ -77,14 +77,18 @@ class build:
             config_json = self.load_config(config_file)
             config_json['rebuild'] = False # Set to false if able to load a pre-existing model
         
-        config_json = config_json or config_template # Use passed in config or default config
+            if config_json == None: # If all efforts failed to load file
+                print("Config passed in couldn't be loaded")
+                return None
+        else:
+            config_json = config_template
 
         self.configure(**config_json) # Build configuration
 
         atexit.register(self.save_config)
         
     def __repr__(self):
-        return '\n'.join([f"{key}: {value}" for key, value in self.dump.items()])
+        return '\n'.join([f"{key}: {value}" for key, value in self.__dict__.items()])
     
     def save_config(self, config_path = None):
         config_path = config_path or f"{self.project_directory}{self.model_directory}/model/config.json"
