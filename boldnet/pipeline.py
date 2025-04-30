@@ -8,9 +8,10 @@ from scipy.stats import zscore
 class wrangler:
 	def __init__(self, config):
 		self.config = config
+		print(f"Wrangler excluded")
 		return
 	
-	def wrangle(self, subject_pool, subjects = [], count = 0, session = '*', fold_size = 10, shuffle = False, resolution = np.float16, activation = 'linear',  exclude_trained = False):
+	def wrangle(self, subjects = [], count = 0, session = '*', fold_size = 10, shuffle = False, resolution = np.float16, activation = 'linear',  exclude_trained = False):
 		# Wrangle subjects into training and validation batches, using the fold size
 		# to determine how many subjects to put in the training set compared to validation
 		#
@@ -19,7 +20,7 @@ class wrangler:
 
 		print(f"Wrangling {count} subjects data (session {session}) with fold of size {fold_size}.")
 
-		print(f"Training portion: {round(((fold_size - 2)/fold_size)*100, 1)}%\nValidation portion: {round((1/fold_size)*100, 1)}%\nTesting portion: {round((1/fold_size)*100, 1)}%\n")
+		print(f"Training portion: {round(((fold_size - 2) / fold_size) * 100, 1)}%\nValidation portion: {round((1 / fold_size) * 100, 1)}%\nTesting portion: {round((1 / fold_size) * 100, 1)}%\n")
 	
 		# Handle misformatted subjects
 		if isinstance(subjects, list) == False:
@@ -48,14 +49,42 @@ class wrangler:
 		train_indices = []
 		val_indices = []
 
+		# Check if we're loading a partially trained model
+		viewed_count = len(self.config.trained_pool) + len(self.config.validation_pool) + len(self.config.test_pool) # Assess how many subjects have been processed
+		position = viewed_count % fold_size # Calculate the current fold position
+
+		if viewed_count > 0 and position != 0: # Update current fold if stopped midfold
+			# Load the last validation subject
+			images, labels = self.load_subject(self.config.validation_pool[-1], session, shuffle, resolution, activation)
+				
+			# Replace any NaN in BOLD images
+			nan_indices = np.isnan(images) # Find all NaN values
+			images[nan_indices] = 1e-6 # Replace with a small value/epsilon
+
+			# Remove images with irrelavent labels
+			nan_indices = np.isnan(labels)
+			self.validation_labels = labels[~nan_indices]
+			self.validation_image = images[~nan_indices]
+
+			# Update training batch with previously run
+			for pool_ind in range(len(self.config.subject_pool) - 1, -1, -1): # Find validation subject location
+				if self.config.subject_pool[pool_ind] == self.config.validation_pool[-1]:
+					break
+
+			while self.config.subject_pool[pool_ind + 1] in self.config.trained_pool:
+				self.training_batch.append(self.config.subject_pool[pool_ind + 1]) # Add train subject to train batch
+				pool_ind += 1
+
+
 		# While we haven't reached out subject count goal (minimum of 2)
 		while subject_count < count:
 
 			# If we've run out of subjects but need more
 			if subjects == []: 
 				subject = self.config.subject_pool.pop(random.randint(0, len(self.config.subject_pool) - 1))
-			else: # Grab the first subject in our passes subject list
+			else: # qGrab the first subject in our passes subject list
 				subject = subjects.pop(0)
+			print(f"Wrangling subject {subject}")
 
 			# Check if subject is in excluded list
 			if subject in self.config.excluded_pool: 
@@ -63,13 +92,15 @@ class wrangler:
 				continue
 
 			# If subject previously run and we're not retraining\
-			if exclude_trained == True and sum([subject == trained_subject for trained_subject in self.config.trained_pool]) > 0: # check is subject previously run
+			if exclude_trained and sum([subject == trained_subject for trained_subject in self.config.trained_pool]) > 0: # check is subject previously run
 				print(f"Subject {subject} previously run, skipping subject...\n")
 				continue
 
 			# Assess subject position in fold
-			viewed_count = len(self.config.trained_pool) + len(self.config.validation_pool) + len(self.config.test_pool) + len(self.training_batch)
-			position = viewed_count % fold_size
+			trained = set(self.training_batch + self.config.trained_pool) # Combine training batch and pool to prevent duplicates
+			viewed_count = len(trained) + len(self.config.validation_pool) + len(self.config.test_pool) # Assess how many subjects have been processed
+			position = viewed_count % fold_size # Calculate the current fold position
+
 			if subject in self.config.test_pool: # If requesting a test pool subject
 				position = -1 # Mark as test subject load
 
