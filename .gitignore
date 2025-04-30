@@ -177,3 +177,4 @@ logs/*
 models/*
 __pycache__/
 bsub/*
+boldnet_copy/
