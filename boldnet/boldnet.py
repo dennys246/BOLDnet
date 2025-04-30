@@ -12,7 +12,7 @@ class boldnet:
 	def __init__(self, network_folder = None):
 
 		self.config = config.build(network_folder) or config.build() # Load default configuration
-		
+
 		if self.config == False: # If configuration build failed
 			print("Configuration failed, exiting...") 
 			return # Exit
@@ -134,7 +134,7 @@ class boldnet:
 			self.x_test, self.y_test = [None] * 2
 			clean_mem()
 
-		results = self.wrangler.wrangle(self.subject_pool, subjects, count, session, fold_size, shuffle, resolution, activation, exclude_trained)
+		results = self.wrangler.wrangle(subjects, count, session, fold_size, shuffle, resolution, activation, exclude_trained)
 		if results != False:
 			if test_count:
 				self.x_test, self.y_test = results
