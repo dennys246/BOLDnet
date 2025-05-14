@@ -1,4 +1,4 @@
-import json, atexit
+import json, atexit, copy
 from glob import glob
 
 config_template = {
@@ -61,27 +61,28 @@ class build:
         if config_folder: # Try and load config if folder passed in     
             config_json = None
             config_files = glob(f"{config_folder}config.json")
+            print(config_files)
             if len(config_files) == 0:
                 config_files = glob(f"{config_folder}/model/config.json")
                 if len(config_files) == 0:
-                    print(f'No config json files found in {config_folder}')
-                    return None
-            if len(config_files) > 1:
-                response = input("Multiple config files found, please enter the number corresponding to the file would you like to use?\n" + "\n".join([f"{ind + 1} - {file}" for ind, file in enumerate(config_files)] + "\nc - cancel\n\n"))
-                if response == 'c' or response.isdigit() == False:
-                    return None
-                else:
-                    config_file = config_files[int(response) - 1]
-            else:
-                config_file = config_files[0]
-            config_json = self.load_config(config_file)
-            config_json['rebuild'] = False # Set to false if able to load a pre-existing model
+                    print(f'WARNING: No config json files found in {config_folder}, using default config build...')
+                    config_json = copy.deepcopy(config_template)
+            
+            if len(config_files) > 1: # If multiple config files found
+                raise LookupError("ERROR: Multiple config files found, please enter the number corresponding to the file would you like to use?\n" + "\n".join([f"{ind + 1} - {file}" for ind, file in enumerate(config_files)] + "\nc - cancel\n\n"))
+            
+            if config_files: # If we have a single config file
+                print(f"Loading config file: {config_files[0]}")
+                config_json = self.load_config(config_files[0])
+                config_json['rebuild'] = False # Set to false if able to load a pre-existing model
         
             if config_json == None: # If all efforts failed to load file
                 print("Config passed in couldn't be loaded")
                 return None
+
         else:
-            config_json = config_template
+            print("No config passed in, using default config build...")
+            config_json = copy.deepcopy(config_template)
 
         self.configure(**config_json) # Build configuration
 
