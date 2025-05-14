@@ -63,27 +63,29 @@ class boldnet:
 			# Grab all available sessions
 			sessions = glob(f"{subject}/ses-*/")
 			
-
 			# If none found alert about missing data
 			if len(sessions) == 0:
 				print(f"No sessions found for {subject_id}")
-			split = sessions[0].split('/')
-			if split[-1]:
-				self.example_session = split[-1]
-			else:
-				self.example_session = split[-2]
-			self.example_session = self.example_session.split('-')[-1]
 
 			# Iterate through each session
 			for session in sessions:
+
+				session_number = session.split('ses-')[-1].split('/')[0]
 
 				# Look if the subject has usable bold file
 				bold_filename = glob(f"{session}/func/{self.config.bold_identifier}")
 				if len(bold_filename) == 0: # If none found, skip
 					continue
+
 				if len(bold_filename) > 1: # If too many found, skip
 					bold_filename = '\n'.join(bold_filename)
 					print(f"Multiple bold files found for {subject_id}...\n{bold_filename}")
+					continue
+
+				# Grab bold file shape...
+				self.config.data_shape = self.wrangler.load_shape(subject_id, session_number)
+				if self.config.data_shape == False:
+					print(f"Failed to find BOLD image header info for subject {subject} session {session}...")
 					continue
 
 				# Look if the subject has labels (regressors/classifiers)
@@ -91,7 +93,14 @@ class boldnet:
 				if len(label_filename) == 0: # If none found, skip
 					print(f"No labels found for {subject_id}, excluding from analysis...")
 					continue
-				if len(label_filename) > 1: # If too many found, continue
+
+				# If the label file is empty, skip
+				if os.path.getsize(label_filename[0]) == 0:
+					print(f"Label file is empty for {subject_id}, excluding from analysis...")
+					continue
+
+				# If too many found, continue
+				if len(label_filename) > 1: 
 					label_filename = '\n'.join(label_filename)
 					print(f"Multiple label files found for {subject_id}...\n{label_filename}")
 					continue
@@ -195,7 +204,7 @@ class boldnet:
 
 		# Plan and build out model structure based on config
 		print('\nConstructing BOLDnet model')
-		if self.config.data_shape == None: # Grab x, y, z dimension sizes from first subject 
+		if not self.config.data_shape: # Grab x, y, z dimension sizes from first subject 
 			self.config.data_shape = self.wrangler.load_shape(self.subject_pool[0], self.example_session)
 		
 		self.plan() # Call plan function to predict model dimensions
