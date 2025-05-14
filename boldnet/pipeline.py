@@ -288,7 +288,10 @@ class wrangler:
 	def load_shape(self, subject, session, image = None):
 		if image == None:
 			image = self.load_image(subject, session)
-		return image.header.get_data_shape()
+		if image == False:
+			return image
+		else:
+			return image.header.get_data_shape()
 
 	def shuffle(self, images, labels):
 		# Get sample indices
