@@ -3,11 +3,11 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "neuronet"
+name = "boldnet"
 version = "0.1.0"
 description = "A package for building convolutional neural networks for neuroimaging data"
 readme = "README.md"
-authors = [{ name = "Denny Schaedig", email = "denny.schaedig@gmail.com" }]
+authors = [{ name = "Denny Schaedig", email = "dennys@rmdig.ai" }]
 license = { file = "LICENSE" }
 dependencies = [
     "requests",  # Example dependency
@@ -28,6 +28,6 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dennys246/NeuroNet"
-Documentation = "https://github.com/dennys246/NeuroNet/blob/main/README.md"
-Source = "https://github.com/dennys246/NeuroNet"
+Homepage = "https://github.com/dennys246/BOLDnet"
+Documentation = "https://github.com/dennys246/BOLDnet/README.md"
+Source = "https://github.com/dennys246/BOLDnet"
